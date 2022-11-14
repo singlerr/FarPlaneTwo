@@ -1,0 +1,151 @@
+/*
+ * Adapted from The MIT License (MIT)
+ *
+ * Copyright (c) 2020-2021 DaPorkchop_
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+ * is furnished to do so, subject to the following conditions:
+ *
+ * Any persons and/or organizations using this software must include the above copyright notice and this permission notice,
+ * provide sufficient credit to the original authors of the project (IE: DaPorkchop_), as well as provide a link to the original project.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
+
+//this can't be set in gradle.properties since it's dynamic
+System.setProperty("fp2Version", "$fp2VersionMajor." + ('git rev-list --count HEAD'.execute().text.trim()))
+allprojects {
+    ext {
+        fp2Version = System.getProperty("fp2Version")
+
+        ideaSyncActive = "true".equalsIgnoreCase(System.getProperty("idea.sync.active"))
+    }
+}
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "java-library"
+
+    if (ideaSyncActive.toBoolean()) {
+        apply plugin: "idea"
+    }
+
+    version = "$fp2Version"
+    group = "net.daporkchop.fp2"
+
+    if (ideaSyncActive.toBoolean()) {
+        idea.module.inheritOutputDirs = true
+    }
+
+    java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+    compileJava.sourceCompatibility = compileJava.targetCompatibility = "$javaVersion"
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        options.headerOutputDirectory.convention(null) // https://github.com/gradle/gradle/issues/12904
+    }
+
+    ext.inherit0 = { Object... args ->
+        if (args[0] instanceof Project) {
+            String path = ((Project) args[0]).path
+            dependencies {
+                provided_ project(path: path, configuration: "provided_")
+            }
+        }
+    }
+
+    ext.shade = { Object... args ->
+        if (args.length == 1 && args[0] instanceof DefaultProjectDependency) {
+            String path = ((DefaultProjectDependency) args[0]).dependencyProject.path
+            dependencies {
+                inherit0 args
+                shade_ args {
+                    transitive = false
+                }
+                shade_ project(path: path, configuration: "shade_")
+            }
+        } else {
+            dependencies {
+                shade_ args
+            }
+        }
+    }
+
+    ext.apiShade = { Object... args ->
+        dependencies {
+            inherit0 args
+            api args
+            shade args
+        }
+    }
+
+    ext.implementationProvided = { Object... args ->
+        dependencies {
+            inherit0 args
+            compileOnly args
+            provided_ args
+        }
+    }
+
+    ext.implementationShade = { Object... args ->
+        dependencies {
+            inherit0 args
+            implementation args
+            shade args
+        }
+    }
+
+    ext.runtimeOnlyProvided = { Object... args ->
+        dependencies {
+            inherit0 args
+            runtimeOnly args
+            provided_ args
+        }
+    }
+
+    ext.runtimeOnlyShade = { Object... args ->
+        dependencies {
+            inherit0 args
+            runtimeOnly args
+            shade args
+        }
+    }
+
+    configurations {
+        shade_
+        provided_
+
+        provided_.extendsFrom runtime
+    }
+
+    repositories {
+        maven {
+            name = "DaPorkchop_"
+            url = "https://maven.daporkchop.net/"
+        }
+        maven {
+            name = "SpongePowered"
+            url = "https://repo.spongepowered.org/maven/"
+        }
+        mavenCentral()
+    }
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
+        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+        testImplementation project(path: project.path, configuration: "provided_")
+
+        testImplementation "junit:junit:$junitVersion"
+        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    }
+}
