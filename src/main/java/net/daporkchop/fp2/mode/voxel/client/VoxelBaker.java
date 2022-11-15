@@ -35,6 +35,7 @@ import net.daporkchop.fp2.mode.voxel.client.struct.VoxelLocalAttributes;
 import net.daporkchop.fp2.util.SingleBiomeBlockAccess;
 import net.daporkchop.lib.common.pool.array.ArrayAllocator;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
@@ -137,7 +138,7 @@ public class VoxelBaker implements IRenderBaker<VoxelPos, VoxelTile, IndexedBake
             if (src == null) {
                 continue;
             }
-
+            Minecraft.getMinecraft().blockRenderDispatcher
             int maxDx = CONNECTION_INTERSECTION_VOLUMES[i * 3 + 0];
             int maxDy = CONNECTION_INTERSECTION_VOLUMES[i * 3 + 1];
             int maxDz = CONNECTION_INTERSECTION_VOLUMES[i * 3 + 2];

@@ -63,7 +63,12 @@ public abstract class AbstractExactVoxelGenerator extends AbstractVoxelGenerator
         for (int i = 0, dx = CACHE_MIN; dx < CACHE_MAX; dx++) { //set each type flag depending on the block state at the corresponding position
             for (int dy = CACHE_MIN; dy < CACHE_MAX; dy++) {
                 for (int dz = CACHE_MIN; dz < CACHE_MAX; dz++, i++) {
-                    stateMap[i] = FastRegistry.getId(world.getBlockState(pos.setPos(baseX + dx, baseY + dy, baseZ + dz)));
+                    TileEntityBlockChiseled tileEntity = ModUtil.getChiseledTileEntity(world, pos.setPos(baseX + dx, baseY + dy, baseZ + dz));
+                    if(tileEntity != null)
+                        stateMap[i] = tileEntity.getBitAccess().getVoxelStats().mostCommonState;
+                    else
+                        stateMap[i] = FastRegistry.getId(world.getBlockState(pos.setPos(baseX + dx, baseY + dy, baseZ + dz)));
+
                 }
             }
         }

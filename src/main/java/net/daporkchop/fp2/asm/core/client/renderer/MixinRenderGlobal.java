@@ -108,6 +108,7 @@ public abstract class MixinRenderGlobal implements IMixinRenderGlobal {
     private void fp2_renderBlockLayer_pre(BlockRenderLayer layer, double partialTicks, int pass, Entity entity, CallbackInfoReturnable<Integer> ci) {
         IFarClientContext<?, ?> context = ((IFarPlayerClient) this.mc.getConnection()).fp2_IFarPlayerClient_activeContext();
         IFarRenderer renderer;
+
         if (context != null && (renderer = context.renderer()) != null) {
             this.mc.profiler.startSection("fp2_render_pre");
             System.out.println("fp2_renderBlockLayer_pre, context -> " + context.getClass().getName() + ", renderer -> "+renderer.getClass().getName());
