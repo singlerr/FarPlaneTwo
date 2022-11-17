@@ -113,6 +113,10 @@ public abstract class AbstractPrefetchedAsyncBlockAccess<P extends IAsyncBlockAc
 
     @Override
     public TileEntity getTileEntity(BlockPos pos) {
-        throw new UnsupportedOperationException();
+        try{
+            return world.getTileEntity(pos);
+        }catch (Exception ex){
+            return null;
+        }
     }
 }

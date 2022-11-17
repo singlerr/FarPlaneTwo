@@ -94,7 +94,6 @@ public abstract class MixinRenderGlobal implements IMixinRenderGlobal {
         if (context != null && (renderer = context.renderer()) != null) {
             this.fp2_vanillaRenderabilityTracker.update(uncheckedCast(this));
             this.mc.profiler.startSection("fp2_prepare");
-            System.out.println("fp2_setupTerrain_prepare");
             renderer.prepare((float) partialTicks, this.mc, (IFrustum) camera);
             this.mc.profiler.endSection();
         }
@@ -111,7 +110,6 @@ public abstract class MixinRenderGlobal implements IMixinRenderGlobal {
 
         if (context != null && (renderer = context.renderer()) != null) {
             this.mc.profiler.startSection("fp2_render_pre");
-            System.out.println("fp2_renderBlockLayer_pre, context -> " + context.getClass().getName() + ", renderer -> "+renderer.getClass().getName());
             renderer.render(this.mc, layer, true);
             this.mc.profiler.endSection();
         }
@@ -125,7 +123,6 @@ public abstract class MixinRenderGlobal implements IMixinRenderGlobal {
         IFarRenderer renderer;
         if (context != null && (renderer = context.renderer()) != null) {
             this.mc.profiler.startSection("fp2_render_post");
-            System.out.println("fp2_renderBlockLayer_post");
             renderer.render(this.mc, layer, false);
             this.mc.profiler.endSection();
         }

@@ -31,10 +31,13 @@ import net.daporkchop.lib.unsafe.PUnsafe;
 import net.daporkchop.lib.unsafe.util.exception.AlreadyReleasedException;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.ViewFrustum;
+import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
+import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
+import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
 import static net.daporkchop.fp2.client.gl.OpenGL.*;
@@ -132,6 +135,7 @@ public class VanillaRenderabilityTracker extends AbstractRefCounted {
         int factorChunkX = maxChunkX - minChunkX + 3;
         int factorChunkY = maxChunkY - minChunkY + 3;
         int factorChunkZ = maxChunkZ - minChunkZ + 3;
+
 
         //iterate over all the RenderChunks which have been compiled, setting bits indicating whether or not they exist and which edges' neighboring
         //  chunk sections are visible
@@ -237,6 +241,16 @@ public class VanillaRenderabilityTracker extends AbstractRefCounted {
         this.sizeBytes = sizeBytes;
         this.addr = addr;
         this.dirty = true;
+    }
+
+    private double getDistanceSq(RenderChunk chunk){
+        try {
+            Method method = chunk.getClass().getMethod("getDistanceSq");
+            method.setAccessible(true);
+            return (double)method.invoke(chunk);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     /**
