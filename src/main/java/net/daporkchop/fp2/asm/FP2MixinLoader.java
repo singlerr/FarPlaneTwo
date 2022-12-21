@@ -34,6 +34,7 @@ import static net.daporkchop.fp2.debug.FP2Debug.*;
 /**
  * @author DaPorkchop_
  */
+@IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
 public class FP2MixinLoader implements IFMLLoadingPlugin {
     /**
      * Whether or not we are currently running in a development environment.
@@ -56,7 +57,7 @@ public class FP2MixinLoader implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[0];
+        return new String[]{SVertexBuilderTransformer.class.getName()};
     }
 
     @Override

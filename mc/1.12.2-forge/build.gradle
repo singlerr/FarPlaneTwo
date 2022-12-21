@@ -61,6 +61,7 @@ minecraft {
 
             property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
             property "forge.logging.console.level", "debug"
+            arg '-torg.spongepowered.asm.launch.MixinTweaker'
         }
     }
 }
@@ -148,7 +149,7 @@ dependencies {
     if (ideaSyncActive.toBoolean()) {
         //intellij is present - we don't want it to register mixin as an annotation processor, so we just add it as a standard dependency.
         //  if we don't do this, the intellij annotation processors will get totally screwed up
-        implementationProvided "org.spongepowered:mixin:$mixinVersion"
+        implementationShade "org.spongepowered:mixin:$mixinVersion"
     } else {
         //register mixin as a standard annotation processor
         annotationProcessor "org.spongepowered:mixin:$mixinVersion:processor"
@@ -237,6 +238,39 @@ shadowJar {
 
 reobf {
     shadowJar {}
+}
+tasks.register("copyToMod") {
+    doLast {
+        def file = file("build/libs").listFiles(new FileFilter() {
+            @Override
+            boolean accept(File pathname) {
+                return pathname.name.endsWith(".jar")
+            }
+        })[0]
+        def modFile = new File("C:\\Users\\Singlerr\\AppData\\Roaming\\.minecraft\\mods\\${file.name}")
+
+        if (modFile.exists())
+            modFile.delete()
+
+        def inputStream = new FileInputStream(file)
+
+        def outputStream = new FileOutputStream(modFile)
+
+        int len
+        byte[] buf = new byte[4096]
+
+        while ((len = inputStream.read(buf)) != -1)
+            outputStream.write(buf, 0, len)
+
+        inputStream.close()
+        outputStream.close()
+
+        println "Successfully copied from ${file.path} to ${modFile.path}"
+    }
+}
+
+tasks.named("build") {
+    finalizedBy("copyToMod")
 }
 
 shadowJar.finalizedBy reobfShadowJar

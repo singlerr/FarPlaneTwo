@@ -30,7 +30,9 @@ import net.daporkchop.fp2.mode.api.player.IFarPlayerClient;
 import net.daporkchop.fp2.common.util.alloc.DirectMemoryAllocator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.ChunkRenderContainer;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
@@ -126,6 +128,7 @@ public abstract class MixinRenderGlobal implements IMixinRenderGlobal {
             renderer.render(this.mc, layer, false);
             this.mc.profiler.endSection();
         }
+
     }
 
     @Override

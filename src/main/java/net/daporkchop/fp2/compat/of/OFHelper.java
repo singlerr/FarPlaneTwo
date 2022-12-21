@@ -24,9 +24,14 @@ import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.daporkchop.fp2.util.Constants;
 import net.daporkchop.lib.unsafe.PUnsafe;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -99,6 +104,16 @@ public class OFHelper {
     private static final MethodHandle OF_SHADERS_BEGINWATER = !OF ? null : Constants.staticHandle("net.optifine.shaders.Shaders", void.class, "beginWater");
     private static final MethodHandle OF_SHADERS_ENDWATER = !OF ? null : Constants.staticHandle("net.optifine.shaders.Shaders", void.class, "endWater");
 
+    private static final MethodHandle OF_SHADERS_PUSHENTITY = !OF ? null : Constants.staticHandle("net.optifine.shaders.Shaders",void.class,"pushEntity", Block.class);
+
+    private static final MethodHandle OF_SVERTEXBUILDER_PUSHENTITY = !OF ? null : Constants.staticHandle("net.optifine.shaders.SVertexBuilder" , void.class, "pushEntity", IBlockState.class, BlockPos.class, IBlockAccess.class, BufferBuilder.class);
+
+    private static final MethodHandle OF_SVERTEXBUILDER_POPENTITY = !OF ? null : Constants.staticHandle("net.optifine.shaders.SVertexBuilder", void.class, "popEntity", BufferBuilder.class);
+
+
+
+
+
     public static final String OF_DEFINE_SHADERS = "OPTIFINE_SHADERS";
 
     @SneakyThrows(Throwable.class)
@@ -106,6 +121,19 @@ public class OFHelper {
         return OF && isShadersReflection();
     }
 
+    @SneakyThrows(Throwable.class)
+    public static void of_Shaders_pushEntity(Block block){
+        OF_SHADERS_PUSHENTITY.invokeExact(block);
+    }
+    @SneakyThrows(Throwable.class)
+    public static void of_SVertexBuilder_popEntity( BufferBuilder wrr){
+        OF_SVERTEXBUILDER_POPENTITY.invokeExact(wrr);
+    }
+
+    @SneakyThrows(Throwable.class)
+    public static void of_SVertexBuilder_pushEntity(IBlockState blockState, BlockPos blockPos, IBlockAccess blockAccess, BufferBuilder wrr){
+        OF_SVERTEXBUILDER_PUSHENTITY.invokeExact(blockState,blockPos,blockAccess,wrr);
+    }
     private static boolean isShadersReflection(){
         try {
             Class<?> cls = Class.forName("Config");

@@ -30,6 +30,7 @@ import net.daporkchop.fp2.net.FP2Network;
 import net.daporkchop.fp2.server.FP2Server;
 import net.daporkchop.fp2.util.threading.futureexecutor.ServerThreadMarkedFutureExecutor;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -94,6 +95,7 @@ public class FP2 {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             FP2Client.postInit();
         }
+
     }
 
     @Mod.EventHandler
